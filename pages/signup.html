@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Ensures mobile-friendliness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant H2O - Signup</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      /* vendor prefixed linear gradient for older Safari */
+      background: -webkit-linear-gradient(left, #003049, #001d2d);
+      background: linear-gradient(to right, #003049, #001d2d);
+      color: white;
+      /* fallback to ensure center alignment if flex not supported */
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      height: 100vh;
+    }
+
+    .top-links {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .top-links a {
+      margin-right: 15px;
+      color: #00f7ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .top-links a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      font-size: 50px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 0;
+      -webkit-animation: float-title 3s ease-in-out infinite;
+              animation: float-title 3s ease-in-out infinite;
+    }
+    h1 span {
+      -webkit-animation: glow 2s ease-in-out infinite;
+              animation: glow 2s ease-in-out infinite;
+    }
+
+    /* Glow animation (prefixed) */
+    @-webkit-keyframes glow {
+      0%, 100% {
+        text-shadow: 0 0 10px #00f7ff;
+      }
+      50% {
+        text-shadow: 0 0 25px #00f7ff, 0 0 35px #00eaff;
+      }
+    }
+    @keyframes glow {
+      0%, 100% {
+        text-shadow: 0 0 10px #00f7ff;
+      }
+      50% {
+        text-shadow: 0 0 25px #00f7ff, 0 0 35px #00eaff;
+      }
+    }
+
+    /* Float title animation (prefixed) */
+    @-webkit-keyframes float-title {
+      0%, 100% { -webkit-transform: translateY(0); }
+      50% { -webkit-transform: translateY(-10px); }
+    }
+    @keyframes float-title {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .slogan {
+      font-size: 18px;
+      margin-top: -10px;
+      margin-bottom: 30px;
+      color: #c8faff;
+      text-align: center;
+      -webkit-animation: fade-in 2s ease forwards;
+              animation: fade-in 2s ease forwards;
+    }
+
+    @-webkit-keyframes fade-in {
+      from { opacity: 0; -webkit-transform: translateY(10px); }
+      to { opacity: 1; -webkit-transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .signup-container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      -webkit-box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+              box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+    }
+
+    .signup-container h2 {
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00f7ff;
+    }
+
+    .signup-container form {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+    }
+
+    .signup-container input {
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid #00f7ff;
+      /* remove default iOS input styles */
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+    }
+    .signup-container input:focus {
+      outline: none;
+      -webkit-box-shadow: 0 0 10px #00f7ff;
+              box-shadow: 0 0 10px #00f7ff;
+    }
+
+    .signup-container input[type="submit"] {
+      background-color: #00f7ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      -webkit-transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease;
+    }
+    .signup-container input[type="submit"]:hover {
+      background-color: #00e0e0;
+    }
+
+    .login {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .login a {
+      color: #00f7ff;
+      text-decoration: none;
+    }
+    .login a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Nav -->
+  <div class="top-links">
+    <a href="../index.html">Home</a>
+    <a href="login.html">Login</a>
+  </div>
+
+  <!-- Title -->
+  <h1>
+    <span>I</span>
+    <span>n</span>
+    <span>s</span>
+    <span>t</span>
+    <span>a</span>
+    <span>n</span>
+    <span>t</span>
+    &nbsp;
+    <span>H</span>
+    <span>2</span>
+    <span>O</span>
+  </h1>
+
+  <div class="slogan">
+    💧 Pure. Fast. Affordable. <br />
+    🚀 Join now and get water delivered instantly!
+  </div>
+
+  <!-- Signup Form -->
+  <div class="signup-container">
+    <h2>Create Your Account</h2>
+    <form id="signup-form">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="text" id="phone" placeholder="Phone Number" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="submit" value="Sign Up" />
+    </form>
+    <p class="login">Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <!-- Supabase Auth Script -->
+  <script type="module">
+    import { supabase } from '../supabase.js'; // Adjust path if needed
+
+    const signupForm = document.getElementById('signup-form');
+
+    signupForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // 1) Sign up user in Supabase Auth
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (signUpError) {
+        alert("❌ Signup failed: " + signUpError.message);
+        return;
+      }
+
+      // signUpData.user contains the newly created user
+      if (signUpData.user) {
+        // 2) Insert into "users" table to store name & phone
+        const userId = signUpData.user.id; // The unique ID from Supabase Auth
+
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([
+            {
+              user_id: userId,
+              name: name,
+              email: email,
+              phone: phone
+            }
+          ]);
+
+        if (insertError) {
+          alert("❌ Could not save user profile: " + insertError.message);
+          return;
+        }
+
+        alert("✅ Signup successful! Please check your email to confirm.");
+        // Redirect to login
+        window.location.href = "login.html";
+      } else {
+        alert("❌ Signup succeeded but user object is missing. Check email confirmation!");
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Responsive for mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instant H2O - Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #003049, #001d2d);
+      color: white;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+              justify-content: space-between;
+      padding: 15px 30px;
+      background-color: #001d2d;
+      -webkit-box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
+              box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .navbar h2 {
+      margin: 0;
+      color: #00f7ff;
+      cursor: pointer;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+      -webkit-transition: 0.2s;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .navbar a:hover {
+      color: #00f7ff;
+    }
+
+    /* Order Box */
+    .order-box {
+      display: none;
+      background: #004f5f;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 12px;
+      border: 2px solid #00f7ff;
+      max-width: 600px;
+      text-align: center;
+    }
+    .order-box h3 {
+      color: #00f7ff;
+      margin-bottom: 10px;
+    }
+    .order-box span {
+      font-weight: bold;
+    }
+
+    /* Container Grid (responsive fallback) */
+    .container-grid {
+      display: -ms-grid;
+      display: grid;
+      -ms-grid-columns: (220px)[auto-fit];
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    @supports not (display: grid) {
+      /* fallback for older browsers that don't support CSS grid */
+      .container-grid {
+        display: block;
+      }
+      .water-box {
+        margin-bottom: 20px;
+      }
+    }
+
+    .water-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00f7ff;
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      min-height: 300px;
+      /* flex column layout */
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+      -webkit-transition: -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, -webkit-transform 0.3s ease;
+    }
+
+    .water-box:hover {
+      -webkit-transform: translateY(-5px);
+          transform: translateY(-5px);
+      -webkit-box-shadow: 0 0 20px #00f7ff55;
+              box-shadow: 0 0 20px #00f7ff55;
+    }
+
+    .water-box h3 {
+      margin-bottom: 10px;
+      font-size: 24px;
+      color: #00f7ff;
+    }
+
+    .water-box button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #00f7ff;
+      color: #001d2d;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .water-box button:hover {
+      background-color: #00e6e6;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h2 onclick="window.location.href='index.html'">Instant H2O</h2>
+    <div>
+      <a href="pages/orders.html">My Orders</a>
+      <a href="pages/login.html" id="auth-link">Login</a>
+    </div>
+  </div>
+
+  <!-- Order Live Status Box -->
+  <div id="order-status-box" class="order-box">
+    <h3>🚚 Order Placed!</h3>
+    <p><strong>Item:</strong> <span id="order-item">-</span></p>
+    <p><strong>Payment:</strong> <span id="order-payment">-</span></p>
+    <p><strong>Status:</strong> <span id="order-status">Pending</span></p>
+    <p><strong>Time left:</strong> <span id="order-countdown">--:--</span></p>
+  </div>
+
+  <!-- Container Grid -->
+  <div class="container-grid">
+    <!-- 0.5L Bottle -->
+    <div class="water-box">
+      <h3>0.5L Bottle</h3>
+      <p>Ultra-portable water for quick thirst fixes.</p>
+      <p>Estimated Delivery: 10 minutes</p>
+      <p>Price: ₹5</p>
+      <p>🏷️ Water will be transferred into your bottles</p>
+      <p>💧 Filled with pure, cooled filtered water.</p>
+      <button onclick="orderNow('0.5L Bottle', 5)">Order Now</button>
+    </div>
+
+    <!-- 1L Bottle -->
+    <div class="water-box">
+      <h3>1L Bottle</h3>
+      <p>Perfect for hydration needs.</p>
+      <p>Estimated Delivery: 10 minutes</p>
+      <p>Price: ₹8</p>
+      <p>🏷️ Water will be transferred into your bottles</p>
+      <p>💧 Filled with pure, cooled filtered water.</p>
+      <button onclick="orderNow('1L Bottle', 8)">Order Now</button>
+    </div>
+
+    <!-- 2L Bottle -->
+    <div class="water-box">
+      <h3>2L Bottle</h3>
+      <p>Great for sharing or longer needs.</p>
+      <p>Estimated Delivery: 10 minutes</p>
+      <p>Price: ₹15</p>
+      <p>🏷️ Water will be transferred into your bottles</p>
+      <p>💧 Filled with pure, cooled filtered water.</p>
+      <button onclick="orderNow('2L Bottle', 15)">Order Now</button>
+    </div>
+
+    <!-- 5L Jar -->
+    <div class="water-box">
+      <h3>5L Jar</h3>
+      <p>Large quantity for groups or family.</p>
+      <p>Estimated Delivery: 10 minutes</p>
+      <p>Price: ₹30</p>
+      <p>🏷️ Water will be transferred into your bottles</p>
+      <p>💧 Filled with pure, cooled filtered water.</p>
+      <button onclick="orderNow('5L Jar', 30)">Order Now</button>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script type="module">
+    import { supabase } from './supabase.js';
+
+    const authLink = document.getElementById("auth-link");
+    const box = document.getElementById("order-status-box");
+    const itemEl = document.getElementById("order-item");
+    const paymentEl = document.getElementById("order-payment");
+    const statusEl = document.getElementById("order-status");
+    const countdownEl = document.getElementById("order-countdown");
+
+    let currentUser = null;
+
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      currentUser = user;
+
+      if (user) {
+        authLink.textContent = "Logout";
+        authLink.href = "#";
+        authLink.onclick = async () => {
+          await supabase.auth.signOut();
+          window.location.reload();
+        };
+        loadLiveOrder();
+      }
+    })();
+
+    window.orderNow = function (item, price) {
+      if (!currentUser) return window.location.href = "pages/login.html";
+      localStorage.setItem("selectedItem", item);
+      localStorage.setItem("price", price);
+      window.location.href = "pages/payment.html";
+    };
+
+    async function loadLiveOrder() {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error || !data) return;
+      if (data.status !== "Pending") return;
+
+      // Show live status box
+      box.style.display = "block";
+      itemEl.textContent = data.item_name;
+      paymentEl.textContent = data.payment_method;
+      statusEl.textContent = data.status;
+
+      const end = new Date(data.deliver_by).getTime();
+      const timer = setInterval(() => {
+        const now = Date.now();
+        const diff = Math.floor((end - now) / 1000);
+
+        if (diff <= 0) {
+          clearInterval(timer);
+          box.style.display = "none";
+          return;
+        }
+
+        const min = String(Math.floor(diff / 60)).padStart(2, '0');
+        const sec = String(diff % 60).padStart(2, '0');
+        countdownEl.textContent = `${min}:${sec}`;
+      }, 1000);
+
+      // Listen for realtime updates on this order
+      supabase
+        .channel('order-updates')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+          filter: `id=eq.${data.id}`
+        }, (payload) => {
+          if (payload.new.status === "Delivered") {
+            statusEl.textContent = "Delivered";
+            setTimeout(() => box.style.display = "none", 3000);
+          }
+        })
+        .subscribe();
+    }
+  </script>
+</body>
+</html>

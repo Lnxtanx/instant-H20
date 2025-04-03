@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Ensures mobile-friendliness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant H2O - Payment</title>
+  <style>
+    /* Basic resets & font */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: -webkit-linear-gradient(left, #003049, #001d2d);
+      background: linear-gradient(to right, #003049, #001d2d);
+      color: white;
+
+      /* Flex container fallback for older browsers */
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 20px;
+      color: #00f7ff;
+      text-align: center;
+    }
+
+    .payment-container {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00f7ff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+      margin-top: 20px;
+      /* fallback for older browsers not supporting box-shadow */
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+    }
+
+    .payment-container label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    .payment-container input,
+    .payment-container select {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+      margin-bottom: 15px;
+      -webkit-appearance: none; /* Removes default iOS styling */
+    }
+
+    .payment-container button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #00f7ff;
+      color: #001d2d;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      /* transitions for older browsers */
+      -webkit-transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease;
+    }
+    .payment-container button:hover {
+      background-color: #00e6e6;
+    }
+
+    /* QR container */
+    .qr-container {
+      display: none;
+      margin-bottom: 15px;
+      /* fallback flex */
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+    }
+
+    #qrcode canvas {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Instant H2O - Payment</h1>
+
+  <div class="payment-container">
+    <h2>Order Details</h2>
+    <p><strong>Item:</strong> <span id="item-name">...</span></p>
+    <p><strong>Price:</strong> ₹<span id="item-price">0</span></p>
+
+    <hr/>
+
+    <h2>Delivery Details</h2>
+    <label for="customer-name">Name</label>
+    <input type="text" id="customer-name" readonly />
+
+    <label for="phone">Phone</label>
+    <input type="text" id="phone" readonly />
+
+    <label for="roomNo">Room No and Phone No (or Address)</label>
+    <input type="text" id="roomNo" placeholder="Enter your room / address" required />
+
+    <hr/>
+
+    <h2>Payment Method</h2>
+    <select id="payment-method">
+      <option value="UPI">UPI</option>
+      <option value="COD">Cash on Delivery</option>
+    </select>
+
+    <div class="qr-container" id="qr-container">
+      <p>Scan this QR to Pay</p>
+      <div id="qrcode"></div>
+    </div>
+
+    <button id="place-order-btn">Place Order</button>
+  </div>
+
+  <!-- Local QR Code Generator (ES5 for older browsers) -->
+  <script src="./qrcode.min.js"></script>
+
+  <script type="module">
+    import { supabase } from '../supabase.js';
+
+    const itemNameEl = document.getElementById('item-name');
+    const itemPriceEl = document.getElementById('item-price');
+    const customerNameEl = document.getElementById('customer-name');
+    const phoneEl = document.getElementById('phone');
+    const roomNoEl = document.getElementById('roomNo');
+    const paymentMethodEl = document.getElementById('payment-method');
+    const qrContainer = document.getElementById('qr-container');
+    const qrCodeBox = document.getElementById('qrcode');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+
+    let currentUser = null;
+    const yourUpiId = "8073295463@ptsbi";
+
+    // Retrieve item & price from localStorage
+    const selectedItem = localStorage.getItem("selectedItem") || "";
+    let selectedPrice = parseInt(localStorage.getItem("price") || "0");
+
+    // Fallback pricing if mismatch
+    const itemPricing = {
+      "0.5L Bottle": 5,
+      "1L Bottle": 8,
+      "2L Bottle": 15,
+      "5L Jar": 30
+    };
+    if (itemPricing[selectedItem]) {
+      selectedPrice = itemPricing[selectedItem];
+    }
+
+    itemNameEl.textContent = selectedItem || "Unknown";
+    itemPriceEl.textContent = selectedPrice;
+
+    if (!selectedItem) {
+      alert("No item selected. Redirecting...");
+      window.location.href = "../index.html";
+    }
+
+    // Auth check + load user details
+    (async function init() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "../pages/login.html";
+        return;
+      }
+
+      currentUser = user;
+      // fetch user profile
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (profileError) {
+        console.error(profileError);
+        alert("Could not load user data.");
+      } else {
+        customerNameEl.value = profile.name || user.email;
+        phoneEl.value = profile.phone || "";
+      }
+    })();
+
+    // Show UPI QR code
+    paymentMethodEl.addEventListener("change", () => {
+      qrCodeBox.innerHTML = "";
+      if (paymentMethodEl.value === "UPI") {
+        const qrText = `upi://pay?pa=${yourUpiId}&pn=InstantH2O&am=${selectedPrice}&cu=INR`;
+
+        try {
+          new QRCode(qrCodeBox, {
+            text: qrText,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          qrContainer.style.display = "flex";
+        } catch (err) {
+          console.error("QR Generation Error:", err);
+          alert("⚠️ Failed to generate QR Code.");
+        }
+      } else {
+        qrContainer.style.display = "none";
+      }
+    });
+
+    // Handle Place Order
+    placeOrderBtn.addEventListener("click", async () => {
+      const paymentMode = paymentMethodEl.value;
+      const room = roomNoEl.value.trim();
+
+      if (!room) {
+        alert("Please enter your room or address!");
+        return;
+      }
+
+      if (paymentMode === "UPI") {
+        const confirmed = confirm("✅ Complete the UPI payment and then click OK to confirm.");
+        if (!confirmed) return;
+      }
+
+      // deliver_by => 10 minutes from now
+      const deliverBy = new Date(Date.now() + 10 * 60 * 1000);
+
+      const { error } = await supabase.from("orders").insert({
+        user_id: currentUser.id,
+        item_name: selectedItem,
+        quantity: 1,
+        price: selectedPrice,
+        payment_method: paymentMode,
+        room_no: room,
+        deliver_by: deliverBy.toISOString(),
+        status: "Pending",
+        created_at: new Date().toISOString()
+      });
+
+      if (error) {
+        console.error(error);
+        alert("❌ Order failed: " + error.message);
+      } else {
+        alert("✅ Order placed successfully!");
+        // Clear localStorage
+        localStorage.removeItem("selectedItem");
+        localStorage.removeItem("price");
+        // Go back to index with success param
+        window.location.href = "../index.html?orderPlaced=true";
+      }
+    });
+  </script>
+</body>
+</html>

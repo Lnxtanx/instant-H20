@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Ensures mobile-friendliness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant H2O - Your Orders</title>
+  <style>
+    /* Basic resets & layout */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: -webkit-linear-gradient(left, #003049, #001d2d);
+      background: linear-gradient(to right, #003049, #001d2d);
+      color: white;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      padding: 20px;
+    }
+
+    .top-bar {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+              justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .home-btn {
+      background: #00f7ff;
+      color: #001d2d;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      -webkit-transition: background 0.2s;
+      transition: background 0.2s;
+    }
+    .home-btn:hover {
+      background: #00e0e0;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin: 10px 0;
+    }
+
+    .user-info, .orders {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 12px;
+      -webkit-box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+              box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+      margin: 20px auto;
+      max-width: 700px;
+    }
+
+    .orders table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .orders th, .orders td {
+      padding: 12px;
+      border-bottom: 1px solid #00f7ff;
+      text-align: left;
+    }
+
+    .orders th {
+      background-color: #004466;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 18px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="home-btn">🏠 Home</a>
+  </div>
+
+  <h1>Welcome to Instant H2O 🚚</h1>
+
+  <div class="user-info" id="user-info">
+    <h2>User Details</h2>
+    <p><strong>Name:</strong> <span id="name">Loading...</span></p>
+    <p><strong>Email:</strong> <span id="email">Loading...</span></p>
+    <p><strong>Phone:</strong> <span id="phone">Loading...</span></p>
+  </div>
+
+  <div class="orders" id="orders">
+    <h2>Recent Orders</h2>
+    <div class="loading" id="loading">Fetching your orders...</div>
+    <table id="orders-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="orders-body"></tbody>
+    </table>
+  </div>
+
+  <script type="module">
+    import { supabase } from '../supabase.js';
+
+    const userInfo = document.getElementById('user-info');
+    const ordersBody = document.getElementById('orders-body');
+    const loading = document.getElementById('loading');
+    const ordersTable = document.getElementById('orders-table');
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("You are not logged in. Redirecting to login.");
+      window.location.href = "login.html";
+    }
+
+    // Fetch user profile
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError) {
+      alert("Failed to fetch profile.");
+      console.error(profileError);
+    } else {
+      document.getElementById('name').textContent = profile.name || "N/A";
+      document.getElementById('email').textContent = profile.email || user.email;
+      document.getElementById('phone').textContent = profile.phone || "N/A";
+    }
+
+    // Fetch orders
+    const { data: orders, error: ordersError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (ordersError) {
+      loading.textContent = "Could not load orders.";
+      console.error(ordersError);
+    } else if (!orders || orders.length === 0) {
+      loading.textContent = "No orders found.";
+    } else {
+      loading.style.display = "none";
+      ordersTable.style.display = "table";
+
+      orders.forEach(order => {
+        const tr = document.createElement('tr');
+
+        // Format status for user-friendliness
+        const normalizedStatus = order.status?.toLowerCase();
+        const statusDisplay = (normalizedStatus === "pending")
+          ? "⏳ Pending"
+          : "✅ Delivered";
+
+        tr.innerHTML = `
+          <td>${order.item_name}</td>
+          <td>${order.quantity}</td>
+          <td>₹${order.price}</td>
+          <td>${statusDisplay}</td>
+        `;
+
+        ordersBody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
